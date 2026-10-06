@@ -12,8 +12,17 @@ scheduleAutoLunchCheckout();
 
 const app = express();
 
+const allowedOrigins = new Set([
+  'http://localhost:5173',
+  'https://smart-attendance-v2-tau.vercel.app',
+  ...(process.env.CLIENT_URL || '')
+    .split(',')
+    .map(origin => origin.trim().replace(/\/+$/, ''))
+    .filter(Boolean),
+]);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => callback(null, !origin || allowedOrigins.has(origin)),
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));
